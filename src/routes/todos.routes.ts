@@ -5,15 +5,18 @@ import { Todo } from "../models/todo";
 const router = Router();
 
 let todos: Todo[] = [];
+type RequestBody = { text: string };
+type RequestParams = { id: string };
 
 router.get("/", (req, res) => {
   res.status(200).json({ todos });
 });
 
 router.post("/todo", (req, res) => {
+  const body = req.body as RequestBody;
   const newTodo: Todo = {
     id: new Date().toISOString(),
-    text: req.body.text,
+    text: body.text,
   };
 
   todos.push(newTodo);
@@ -21,12 +24,14 @@ router.post("/todo", (req, res) => {
 });
 
 router.put("/todo/:id", (req, res) => {
-  const id = req.params.id;
+  const body = req.body as RequestBody;
+  const params = req.params as RequestParams;
+  const id = params.id;
   const index = todos.findIndex((todo) => todo.id === id);
   if (index >= 0) {
     todos[index] = {
       id: todos[index].id,
-      text: req.body.text,
+      text: body.text,
     };
 
     return res.status(200).json({ message: "Updated todo!", todos });
@@ -36,7 +41,8 @@ router.put("/todo/:id", (req, res) => {
 });
 
 router.delete("/todo/:id", (req, res) => {
-  todos = todos.filter((todo) => todo.id !== req.params.id);
+  const params = req.params as RequestParams;
+  todos = todos.filter((todo) => todo.id !== params.id);
   res.status(200).json({ message: "Deleted todo" });
 });
 
